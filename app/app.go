@@ -18,10 +18,13 @@ type BooksHandlers struct {
 	BooksService interface {
 		FindAll(ctx context.Context) []Book
 	}
+	Context interface {
+		Get(r *http.Request) context.Context
+	}
 }
 
 func (h *BooksHandlers) GetBooks(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+	ctx := h.Context.Get(r)
 
 	books := h.BooksService.FindAll(ctx)
 
@@ -34,4 +37,10 @@ func (h *BooksHandlers) GetBooks(w http.ResponseWriter, r *http.Request) {
 type Book struct {
 	Title  string `json:"title"`
 	Author string `json:"author"`
+}
+
+type ContextProvider struct{}
+
+func (p *ContextProvider) Get(r *http.Request) context.Context {
+	return appengine.NewContext(r)
 }

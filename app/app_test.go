@@ -13,7 +13,8 @@ func TestGetBooks(t *testing.T) {
 	r, _ := http.NewRequest("GET", "/", nil)
 
 	mockBooksService := &MockBooksService{}
-	h := BooksHandlers{BooksService: mockBooksService}
+	mockContextProvider := &MockContextProvider{}
+	h := BooksHandlers{BooksService: mockBooksService, Context: mockContextProvider}
 
 	h.GetBooks(w, r)
 
@@ -22,7 +23,7 @@ func TestGetBooks(t *testing.T) {
 `
 
 	if body != expected {
-		t.Errorf("Expected %v, got %v", expected, body)
+		t.Errorf("Expected %t, got %t", expected, body)
 	}
 }
 
@@ -33,4 +34,10 @@ func (m *MockBooksService) FindAll(ctx context.Context) []Book {
 		{Title: "The Lord of the Rings", Author: "J.J.R. Tolkien"},
 		{Title: "Harry Potter", Author: "J.K. Rolling"},
 	}
+}
+
+type MockContextProvider struct{}
+
+func (m *MockContextProvider) Get(r *http.Request) context.Context {
+	return context.Background()
 }
