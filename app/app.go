@@ -9,7 +9,12 @@ import (
 )
 
 func init() {
-	booksHandlers := &BooksHandlers{}
+	ctxProvider := &ContextProvider{}
+	booksService := &BooksService{}
+	booksHandlers := &BooksHandlers{
+		BooksService: booksService,
+		Context: ctxProvider,
+	}
 
 	http.HandleFunc("/books", booksHandlers.GetBooks)
 }
@@ -43,4 +48,13 @@ type ContextProvider struct{}
 
 func (p *ContextProvider) Get(r *http.Request) context.Context {
 	return appengine.NewContext(r)
+}
+
+type BooksService struct {}
+
+func (b *BooksService) FindAll(ctx context.Context) []Book {
+	return []Book{
+		{Title: "The Lord of the Rings", Author: "J.J.R. Tolkien"},
+		{Title: "Harry Potter", Author: "J.K. Rolling"},
+	}
 }
